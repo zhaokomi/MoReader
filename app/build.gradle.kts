@@ -117,9 +117,9 @@ dependencies {
     // PDF Viewer
     implementation(libs.androidx.pdf.viewer)
 
-    // EPUB parser
-    implementation(libs.epublib.core)
-    implementation(libs.epublib.tools)
+    // EPUB parser - using custom implementation
+    // implementation(libs.epublib.core)
+    // implementation(libs.epublib.tools)
 
     // HTML parser
     implementation(libs.jsoup)
