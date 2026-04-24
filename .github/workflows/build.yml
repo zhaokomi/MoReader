@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   packages: write
   attestations: write
   actions: read
@@ -42,7 +42,7 @@ jobs:
       - name: Show build log on failure
         if: failure()
         run: |
-          echo \"=== Build Log (last 200 lines) ===\"
+          echo "=== Build Log (last 200 lines) ==="
           tail -200 build.log
 
       - name: Upload build log on failure
@@ -54,9 +54,36 @@ jobs:
           retention-days: 7
 
       - name: Upload APK
-        uses: actions/upload-artifact@v4
         if: success()
+        uses: actions/upload-artifact@v4
         with:
           name: MoReader-debug-apk
           path: app/build/outputs/apk/debug/*.apk
           retention-days: 7
+
+      - name: Create Release
+        if: success()
+        uses: softprops/action-gh-release@v2
+        with:
+          body: |
+            ## 📱 MoReader 墨阅
+
+            Android 电子书阅读器
+
+            ### 新版本功能
+            - 全新架构设计
+            - 支持多种电子书格式 (TXT, EPUB, MOBI, PDF)
+            - 舒适的阅读体验
+
+            ### 安装说明
+            1. 下载下面的 APK 文件
+            2. 在手机上安装（可能需要开启"未知来源"权限）
+            3. 享受阅读！
+
+            ---
+            *此版本由 GitHub Actions 自动构建*
+          files: app/build/outputs/apk/debug/*.apk
+          generate_release_notes: true
+          draft: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
