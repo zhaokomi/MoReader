@@ -1,0 +1,17 @@
+{
+  "version": 2,
+  "sessions": {
+    "8641d3272d474def9a77db056a4d0b6e": [
+      {
+        "expertId": "BackendArchitect",
+        "name": "磐石石",
+        "profession": "后端架构师",
+        "avatarUrl": "https://acc-1258344699.cos.accelerate.myqcloud.com/workbuddy/experts/avatars/02-Engineering/BackendArchitect/BackendArchitect.png",
+        "promptUrl": "https://acc-1258344699.cos.accelerate.myqcloud.com/workbuddy/experts/experts/02-Engineering/BackendArchitect/BackendArchitect_zh.md",
+        "usedAt": 1777051327962,
+        "industryId": "all"
+      }
+    ]
+  },
+  "lastUpdated": 1777053040541
+}

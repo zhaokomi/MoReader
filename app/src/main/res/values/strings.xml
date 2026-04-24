@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">墨阅</string>
+    <string name="app_name_en">MoReader</string>
+
+    <!-- Navigation -->
+    <string name="nav_bookshelf">书架</string>
+    <string name="nav_statistics">统计</string>
+    <string name="nav_settings">设置</string>
+
+    <!-- Bookshelf -->
+    <string name="bookshelf_title">我的书架</string>
+    <string name="bookshelf_empty">书架空空如也，快来添加书籍吧</string>
+    <string name="bookshelf_recent_read">最近阅读</string>
+    <string name="bookshelf_all_books">全部书籍</string>
+    <string name="bookshelf_add_book">导入书籍</string>
+    <string name="bookshelf_grid_view">网格视图</string>
+    <string name="bookshelf_list_view">列表视图</string>
+    <string name="bookshelf_sort">排序</string>
+    <string name="bookshelf_search">搜索书籍</string>
+    <string name="bookshelf_batch_manage">批量管理</string>
+    <string name="bookshelf_delete">删除</string>
+    <string name="bookshelf_move">移动</string>
+    <string name="bookshelf_select_all">全选</string>
+    <string name="bookshelf_deselect_all">取消全选</string>
+
+    <!-- Sort options -->
+    <string name="sort_by_name">按书名</string>
+    <string name="sort_by_import_time">按导入时间</string>
+    <string name="sort_by_read_time">按最近阅读</string>
+    <string name="sort_by_progress">按阅读进度</string>
+
+    <!-- Groups -->
+    <string name="group_default">默认分组</string>
+    <string name="group_create">新建分组</string>
+    <string name="group_edit">编辑分组</string>
+    <string name="group_delete">删除分组</string>
+    <string name="group_name_hint">分组名称</string>
+
+    <!-- Import -->
+    <string name="import_from_file">从文件导入</string>
+    <string name="import_from_folder">扫描文件夹</string>
+    <string name="import_from_wifi">WiFi 传书</string>
+    <string name="import_success">导入成功</string>
+    <string name="import_failed">导入失败</string>
+    <string name="import_duplicate">书籍已存在</string>
+
+    <!-- Book Detail -->
+    <string name="book_detail_info">书籍信息</string>
+    <string name="book_detail_author">作者</string>
+    <string name="book_detail_format">格式</string>
+    <string name="book_detail_size">文件大小</string>
+    <string name="book_detail_progress">阅读进度</string>
+    <string name="book_detail_chapters">目录</string>
+    <string name="book_detail_bookmarks">书签</string>
+    <string name="book_detail_notes">笔记</string>
+    <string name="book_detail_start_reading">开始阅读</string>
+    <string name="book_detail_continue_reading">继续阅读</string>
+    <string name="book_detail_change_cover">更换封面</string>
+
+    <!-- Reader -->
+    <string name="reader_chapter_list">目录</string>
+    <string name="reader_bookmarks">书签</string>
+    <string name="reader_notes">笔记</string>
+    <string name="reader_settings">设置</string>
+    <string name="reader_prev_chapter">上一章</string>
+    <string name="reader_next_chapter">下一章</string>
+    <string name="reader_page_format">第 %1$d / %2$d 页</string>
+    <string name="reader_progress_format">%1$d%%</string>
+
+    <!-- Reader Settings -->
+    <string name="reader_font_size">字体大小</string>
+    <string name="reader_font_family">字体选择</string>
+    <string name="reader_line_spacing">行间距</string>
+    <string name="reader_paragraph_spacing">段间距</string>
+    <string name="reader_page_margin">页边距</string>
+    <string name="reader_brightness">亮度</string>
+    <string name="reader_brightness_follow_system">跟随系统</string>
+    <string name="reader_theme">阅读主题</string>
+    <string name="reader_page_mode">翻页模式</string>
+    <string name="reader_screen_orientation">屏幕方向</string>
+    <string name="reader_keep_screen_on">屏幕常亮</string>
+    <string name="reader_night_mode">夜间模式</string>
+
+    <!-- Page modes -->
+    <string name="page_mode_simulation">仿真翻页</string>
+    <string name="page_mode_cover">覆盖</string>
+    <string name="page_mode_fade">淡入淡出</string>
+    <string name="page_mode_none">无动画</string>
+    <string name="page_mode_vertical">上下滚动</string>
+
+    <!-- Reader themes -->
+    <string name="theme_white">白色</string>
+    <string name="theme_cream">米黄</string>
+    <string name="theme_green">护眼绿</string>
+    <string name="theme_gray">灰色</string>
+    <string name="theme_black">纯黑</string>
+    <string name="theme_custom">自定义</string>
+
+    <!-- Orientation -->
+    <string name="orientation_auto">跟随系统</string>
+    <string name="orientation_portrait">竖屏锁定</string>
+    <string name="orientation_landscape">横屏锁定</string>
+
+    <!-- Bookmark -->
+    <string name="bookmark_add">添加书签</string>
+    <string name="bookmark_delete">删除书签</string>
+    <string name="bookmark_color_red">红色</string>
+    <string name="bookmark_color_orange">橙色</string>
+    <string name="bookmark_color_yellow">黄色</string>
+    <string name="bookmark_color_green">绿色</string>
+
+    <!-- Highlight -->
+    <string name="highlight_add">添加高亮</string>
+    <string name="highlight_delete">删除高亮</string>
+    <string name="highlight_add_note">添加笔记</string>
+
+    <!-- Notes -->
+    <string name="note_add">添加笔记</string>
+    <string name="note_edit">编辑笔记</string>
+    <string name="note_delete">删除笔记</string>
+    <string name="note_export">导出笔记</string>
+    <string name="note_content_hint">写下你的想法...</string>
+
+    <!-- Search -->
+    <string name="search_in_book">在本书中搜索</string>
+    <string name="search_hint">输入关键词</string>
+    <string name="search_no_result">未找到结果</string>
+    <string name="search_result_count">找到 %1$d 个结果</string>
+
+    <!-- TTS -->
+    <string name="tts_start">开始朗读</string>
+    <string name="tts_pause">暂停朗读</string>
+    <string name="tts_resume">继续朗读</string>
+    <string name="tts_stop">停止朗读</string>
+    <string name="tts_speed">语速</string>
+    <string name="tts_pitch">音调</string>
+    <string name="tts_timer">定时停止</string>
+    <string name="tts_timer_off">关闭</string>
+    <string name="tts_timer_10min">10分钟</string>
+    <string name="tts_timer_30min">30分钟</string>
+    <string name="tts_timer_60min">1小时</string>
+
+    <!-- Statistics -->
+    <string name="statistics_title">阅读统计</string>
+    <string name="statistics_today">今日阅读</string>
+    <string name="statistics_total_time">总阅读时长</string>
+    <string name="statistics_total_books">已读书籍</string>
+    <string name="statistics_total_words">阅读总字数</string>
+    <string name="statistics_reading_goal">每日目标</string>
+    <string name="statistics_goal_reached">目标达成！</string>
+    <string name="statistics_calendar">阅读日历</string>
+
+    <!-- Settings -->
+    <string name="settings_title">设置</string>
+    <string name="settings_general">通用设置</string>
+    <string name="settings_appearance">外观</string>
+    <string name="settings_reading">阅读设置</string>
+    <string name="settings_backup">备份与恢复</string>
+    <string name="settings_about">关于</string>
+
+    <!-- General settings -->
+    <string name="settings_language">语言</string>
+    <string name="settings_dark_mode">深色模式</string>
+    <string name="settings_dark_mode_follow_system">跟随系统</string>
+    <string name="settings_dark_mode_on">开启</string>
+    <string name="settings_dark_mode_off">关闭</string>
+    <string name="settings_auto_lock">应用锁</string>
+    <string name="settings_auto_lock_off">关闭</string>
+    <string name="settings_auto_lock_pin">PIN码</string>
+    <string name="settings_auto_lock_fingerprint">指纹</string>
+
+    <!-- Backup -->
+    <string name="backup_export">导出备份</string>
+    <string name="backup_import">导入备份</string>
+    <string name="backup_success">备份成功</string>
+    <string name="backup_failed">备份失败</string>
+    <string name="backup_restore_success">恢复成功</string>
+    <string name="backup_restore_failed">恢复失败</string>
+
+    <!-- Cache -->
+    <string name="cache_manage">缓存管理</string>
+    <string name="cache_clear">清空缓存</string>
+    <string name="cache_size">缓存大小</string>
+
+    <!-- Timer -->
+    <string name="timer_shutdown">定时关闭</string>
+    <string name="timer_shutdown_off">关闭</string>
+    <string name="timer_remaining">剩余 %1$s</string>
+
+    <!-- About -->
+    <string name="about_version">版本</string>
+    <string name="about_feedback">反馈</string>
+    <string name="about_privacy">隐私政策</string>
+    <string name="about_license">开源许可</string>
+
+    <!-- Common -->
+    <string name="ok">确定</string>
+    <string name="cancel">取消</string>
+    <string name="confirm">确认</string>
+    <string name="save">保存</string>
+    <string name="delete">删除</string>
+    <string name="edit">编辑</string>
+    <string name="close">关闭</string>
+    <string name="retry">重试</string>
+    <string name="loading">加载中...</string>
+    <string name="error">错误</string>
+    <string name="success">成功</string>
+
+    <!-- Permissions -->
+    <string name="permission_storage_title">存储权限</string>
+    <string name="permission_storage_message">需要存储权限来读取和管理电子书文件</string>
+    <string name="permission_notification_title">通知权限</string>
+    <string name="permission_notification_message">需要通知权限来显示朗读控制</string>
+
+    <!-- File formats -->
+    <string name="format_txt">TXT</string>
+    <string name="format_epub">EPUB</string>
+    <string name="format_mobi">MOBI</string>
+    <string name="format_azw3">AZW3</string>
+    <string name="format_pdf">PDF</string>
+
+    <!-- Encoding -->
+    <string name="encoding_auto">自动检测</string>
+    <string name="encoding_utf8">UTF-8</string>
+    <string name="encoding_gbk">GBK</string>
+    <string name="encoding_gb2312">GB2312</string>
+    <string name="encoding_big5">BIG5</string>
+
+    <!-- WiFi Transfer -->
+    <string name="wifi_transfer_title">WiFi 传书</string>
+    <string name="wifi_transfer_hint">确保手机和电脑在同一网络下</string>
+    <string name="wifi_transfer_address">访问地址</string>
+    <string name="wifi_transfer_open_browser">打开浏览器上传</string>
+    <string name="wifi_transfer_stop">停止服务</string>
+
+    <!-- Error messages -->
+    <string name="error_file_not_found">文件未找到</string>
+    <string name="error_file_corrupted">文件已损坏</string>
+    <string name="error_unsupported_format">不支持的文件格式</string>
+    <string name="error_encoding_detection_failed">无法检测文件编码</string>
+    <string name="error_chapter_detection_failed">无法识别章节结构</string>
+
+    <!-- Content descriptions -->
+    <string name="cd_book_cover">书籍封面</string>
+    <string name="cd_reading_progress">阅读进度</string>
+    <string name="cd_more_options">更多选项</string>
+    <string name="cd_back">返回</string>
+    <string name="cd_menu">菜单</string>
+    <string name="cd_search">搜索</string>
+    <string name="cd_close">关闭</string>
+</resources>
