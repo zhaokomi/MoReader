@@ -114,8 +114,8 @@ dependencies {
     // Coil for image loading
     implementation(libs.coil.compose)
 
-    // PDF Viewer
-    implementation(libs.androidx.pdf.viewer)
+    // PDF Viewer - temporarily disabled due to JitPack build issues
+    // implementation(libs.androidx.pdf.viewer)
 
     // EPUB parser - using custom implementation
     // implementation(libs.epublib.core)
