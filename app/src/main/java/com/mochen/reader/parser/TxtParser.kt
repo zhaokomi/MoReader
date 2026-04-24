@@ -3,7 +3,7 @@ package com.mochen.reader.parser
 import android.content.Context
 import android.net.Uri
 import com.mochen.reader.domain.model.Chapter
-import org.jsoup.Jocsoup
+import org.jsoup.Jsoup
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.nio.charset.Charset

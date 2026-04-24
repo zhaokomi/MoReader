@@ -7,7 +7,12 @@ import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.*
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -227,48 +232,48 @@ fun BookshelfScreen(
                         horizontalArrangement = Arrangement.spacedBy(12.dp),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        items(uiState.books, key = { it.id }) { book ->
+                        items(uiState.books) { bookItem: com.mochen.reader.domain.model.Book ->
                             BookGridItem(
-                                book = book,
-                                isSelected = book.id in uiState.selectedBookIds,
+                                book = bookItem,
+                                isSelected = bookItem.id in uiState.selectedBookIds,
                                 isSelectionMode = uiState.isSelectionMode,
                                 onClick = {
                                     if (uiState.isSelectionMode) {
-                                        viewModel.toggleBookSelection(book.id)
+                                        viewModel.toggleBookSelection(bookItem.id)
                                     } else {
-                                        onBookClick(book.id)
+                                        onBookClick(bookItem.id)
                                     }
                                 },
                                 onLongClick = {
                                     if (!uiState.isSelectionMode) {
                                         viewModel.toggleSelectionMode()
-                                        viewModel.toggleBookSelection(book.id)
+                                        viewModel.toggleBookSelection(bookItem.id)
                                     }
                                 }
                             )
                         }
                     }
                 } else {
-                    LazyVertical(
+                    LazyColumn(
                         contentPadding = PaddingValues(16.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        items(uiState.books, key = { it.id }) { book ->
+                        items(uiState.books) { bookItem: com.mochen.reader.domain.model.Book ->
                             BookListItem(
-                                book = book,
-                                isSelected = book.id in uiState.selectedBookIds,
+                                book = bookItem,
+                                isSelected = bookItem.id in uiState.selectedBookIds,
                                 isSelectionMode = uiState.isSelectionMode,
                                 onClick = {
                                     if (uiState.isSelectionMode) {
-                                        viewModel.toggleBookSelection(book.id)
+                                        viewModel.toggleBookSelection(bookItem.id)
                                     } else {
-                                        onBookClick(book.id)
+                                        onBookClick(bookItem.id)
                                     }
                                 },
                                 onLongClick = {
                                     if (!uiState.isSelectionMode) {
                                         viewModel.toggleSelectionMode()
-                                        viewModel.toggleBookSelection(book.id)
+                                        viewModel.toggleBookSelection(bookItem.id)
                                     }
                                 }
                             )

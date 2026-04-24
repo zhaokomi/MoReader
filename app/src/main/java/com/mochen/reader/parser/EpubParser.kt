@@ -53,26 +53,35 @@ class EpubParser @Inject constructor() {
                 }
             }
 
-            if (opfContent == null || opfPath == null) {
+            // Store content in local variables immediately after the zip block
+            val opfContentNonNull: String? = opfContent
+            val opfPathNonNull: String? = opfPath
+            val ncxContentNonNull: String? = ncxContent
+
+            if (opfContentNonNull == null || opfPathNonNull == null) {
                 return chapters
             }
 
+            // Now we know these are non-null
+            val opfContentVal: String = opfContentNonNull
+            val ncxContentVal: String? = ncxContentNonNull
+
             // Parse OPF to get spine items and cover
-            val manifest = parseManifest(opfContent)
-            cachedSpineItems = parseSpine(opfContent)
+            val manifest = parseManifest(opfContentVal)
+            cachedSpineItems = parseSpine(opfContentVal)
             cachedCoverHref = manifest["cover"]?.let { href ->
                 manifest.entries.find { it.value == href }?.key
             }
 
             // Parse NCX for table of contents titles
-            cachedTocTitles = if (ncxContent != null) {
-                parseNcxToc(ncxContent)
+            cachedTocTitles = if (ncxContentVal != null) {
+                parseNcxToc(ncxContentVal)
             } else {
-                parseOpfToc(opfContent, manifest)
+                parseOpfToc(opfContentVal, manifest)
             }
 
             // Create chapters from spine items
-            cachedOpfPath = opfPath
+            cachedOpfPath = opfPathNonNull
 
             var chapterIndex = 0
             cachedSpineItems.forEachIndexed { index, _ ->

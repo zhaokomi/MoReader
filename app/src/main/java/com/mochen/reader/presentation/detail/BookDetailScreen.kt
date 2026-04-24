@@ -171,9 +171,10 @@ fun BookDetailScreen(
                 confirmButton = {
                     TextButton(
                         onClick = {
-                            when (deleteTarget) {
-                                is Bookmark -> viewModel.deleteBookmark(deleteTarget.id)
-                                is Note -> viewModel.deleteNote((deleteTarget as Note).id)
+                            val target = deleteTarget
+                            when (target) {
+                                is Bookmark -> viewModel.deleteBookmark(target.id)
+                                is Note -> viewModel.deleteNote(target.id)
                             }
                             showDeleteDialog = false
                             deleteTarget = null
