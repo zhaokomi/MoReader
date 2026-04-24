@@ -18,6 +18,10 @@ data class StatisticsUiState(
     val isLoading: Boolean = false
 )
 
+private data class FiveTuple<A, B, C, D, E>(
+    val a: A, val b: B, val c: C, val d: D, val e: E
+)
+
 @HiltViewModel
 class StatisticsViewModel @Inject constructor(
     private val bookRepository: BookRepository,
@@ -40,15 +44,16 @@ class StatisticsViewModel @Inject constructor(
                 bookRepository.getTotalWordsRead(),
                 statisticsRepository.getTodayReadingTime(),
                 statisticsRepository.getTotalReadingTime(),
-                statisticsRepository.getDailyGoal(),
-                statisticsRepository.getReadingHistory(30)
-            ) { totalBooks, totalWords, todayTime, totalTime, dailyGoal, history ->
+                statisticsRepository.getDailyGoal()
+            ) { totalBooks, totalWords, todayTime, totalTime, dailyGoal ->
+                FiveTuple(totalBooks, totalWords, todayTime, totalTime, dailyGoal)
+            }.combine(statisticsRepository.getReadingHistory(30)) { tuple, history ->
                 ReadingStatistics(
-                    totalBooksRead = totalBooks,
-                    totalReadingTimeSeconds = totalTime,
-                    totalWordsRead = totalWords,
-                    todayReadingTimeSeconds = todayTime,
-                    dailyGoalMinutes = dailyGoal,
+                    totalBooksRead = tuple.a,
+                    totalReadingTimeSeconds = tuple.d,
+                    totalWordsRead = tuple.b,
+                    todayReadingTimeSeconds = tuple.c,
+                    dailyGoalMinutes = tuple.e,
                     dailyReadingHistory = history
                 )
             }.collect { stats ->

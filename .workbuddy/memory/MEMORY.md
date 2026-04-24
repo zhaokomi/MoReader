@@ -19,7 +19,7 @@
 10. ✅ 阅读页核心功能 (多种翻页模式、高亮、设置面板)
 11. ✅ 阅读个性化设置
 12. ✅ 书签、笔记与标注功能
-13. ✅ TXT/EPUB/MOBI/PDF 文件解析
+13. ✅ TXT/EPUB 文件解析 (使用自定义 EpubParser)
 14. ✅ 全文搜索功能
 15. ✅ TTS 语音朗读
 16. ✅ 阅读统计模块
@@ -27,14 +27,18 @@
 18. ✅ GitHub Actions CI/CD 工作流
 19. ✅ 自适应图标资源
 
+## 当前问题 (2026-04-25)
+- ❌ **GitHub Actions 构建失败**: PDF viewer 依赖 (com.github.barteksc:AndroidPdfViewer) 在 JitPack 上的版本存在构建问题
+- 🔧 **临时修复**: 已禁用 PDF viewer 依赖，构建 #16 正在测试中
+- 📝 **待解决问题**: 需要找到可用的 PDF viewer 依赖版本或使用替代方案
+
 ## GitHub 配置
-- .github/workflows/build.yml: 自动化构建
+- .github/workflows/build.yml: 自动化构建 (包含构建、artifact 上传、Release 创建)
 - README.md: 项目文档
 - .gitignore: Android 标准模板
 - LICENSE: Apache 2.0
 
 ## 下一步建议
-1. 下载 Gradle Wrapper JAR 文件并放入 gradle/wrapper/
-2. 在 Android Studio 中打开项目并同步
-3. 配置签名信息用于 Release 构建
-4. 补充功能: WiFi 传书服务完善、PDF 渲染优化
+1. 等待构建 #16 结果
+2. 解决 PDF viewer 依赖问题后重新启用
+3. 确认 Release 自动创建功能正常
