@@ -5,6 +5,7 @@ import android.content.pm.ActivityInfo
 import android.view.WindowManager
 import androidx.compose.animation.*
 import androidx.compose.foundation.*
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -21,7 +22,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -37,17 +38,27 @@ import com.mochen.reader.domain.model.Chapter
 import com.mochen.reader.domain.model.HighlightColor
 import com.mochen.reader.domain.model.Note
 import com.mochen.reader.presentation.theme.ReaderColors
+import kotlinx.coroutines.launch
+import kotlin.math.abs
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReaderScreen(
     bookId: Long,
+    initialChapterIndex: Int = 0,
     onBackClick: () -> Unit,
     viewModel: ReaderViewModel = hiltViewModel()
 ) {
+    // Apply initial chapter index when available
+    LaunchedEffect(initialChapterIndex, viewModel) {
+        if (initialChapterIndex > 0) {
+            viewModel.goToChapter(initialChapterIndex)
+        }
+    }
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
     val activity = context as? Activity
+    val scope = rememberCoroutineScope()
 
     // Full screen handling
     DisposableEffect(uiState.isFullScreen) {
@@ -110,6 +121,10 @@ fun ReaderScreen(
         ReaderThemeType.BLACK -> ReaderColors.BlackText
     }
 
+    // Swipe threshold for horizontal drag
+    val density = LocalDensity.current
+    val swipeThreshold = with(density) { 50.dp.toPx() }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -122,6 +137,23 @@ fun ReaderScreen(
                             offset.x < screenWidth / 3 -> viewModel.previousPage()
                             offset.x > screenWidth * 2 / 3 -> viewModel.nextPage()
                             else -> viewModel.toggleSettingsPanel()
+                        }
+                    }
+                )
+            }
+            .pointerInput(Unit) {
+                detectHorizontalDragGestures(
+                    onDragEnd = {},
+                    onHorizontalDrag = { change, dragAmount ->
+                        change.consume()
+                        if (abs(dragAmount) > swipeThreshold) {
+                            if (dragAmount < 0) {
+                                // Swipe left -> next page
+                                viewModel.nextPage()
+                            } else {
+                                // Swipe right -> previous page
+                                viewModel.previousPage()
+                            }
                         }
                     }
                 )
@@ -160,7 +192,7 @@ fun ReaderScreen(
 
         // Top bar
         AnimatedVisibility(
-            visible = !uiState.isFullScreen || uiState.showSettingsPanel,
+            visible = !uiState.isFullScreen || uiState.showSettingsPanel || uiState.showChapterList,
             enter = slideInVertically() + fadeIn(),
             exit = slideOutVertically() + fadeOut(),
             modifier = Modifier.align(Alignment.TopCenter)
@@ -259,7 +291,7 @@ fun ReaderScreen(
                         Slider(
                             value = uiState.currentPage.toFloat(),
                             onValueChange = { viewModel.goToPage(it.toInt()) },
-                            valueRange = 0f..(uiState.totalPages - 1).coerceAtLeast(0).toFloat(),
+                            valueRange = 0f..maxOf(uiState.totalPages - 1, 0).toFloat(),
                             modifier = Modifier.fillMaxWidth()
                         )
                     }
@@ -279,25 +311,24 @@ fun ReaderScreen(
             }
         }
 
-        // Settings panel
-        AnimatedVisibility(
-            visible = uiState.showSettingsPanel,
-            enter = slideInVertically { it * 2 } + fadeIn(),
-            exit = slideOutVertically { it * 2 } + fadeOut(),
-            modifier = Modifier.align(Alignment.BottomCenter)
-        ) {
-            ReaderSettingsPanel(
-                uiState = uiState,
-                textColor = textColor,
-                backgroundColor = backgroundColor,
-                onFontSizeChange = { viewModel.setFontSize(it) },
-                onLineSpacingChange = { viewModel.setLineSpacing(it) },
-                onThemeChange = { viewModel.setReaderTheme(it) },
-                onBrightnessChange = { viewModel.setBrightness(it) },
-                onBrightnessFollowSystemChange = { viewModel.setBrightnessFollowSystem(it) },
-                onPageModeChange = { viewModel.setPageMode(it) },
-                onDismiss = { viewModel.toggleSettingsPanel() }
-            )
+        // Settings panel (ModalBottomSheet)
+        if (uiState.showSettingsPanel) {
+            ModalBottomSheet(
+                onDismissRequest = { viewModel.toggleSettingsPanel() },
+                containerColor = backgroundColor
+            ) {
+                ReaderSettingsPanelContent(
+                    uiState = uiState,
+                    textColor = textColor,
+                    backgroundColor = backgroundColor,
+                    onFontSizeChange = { viewModel.setFontSize(it) },
+                    onLineSpacingChange = { viewModel.setLineSpacing(it) },
+                    onThemeChange = { viewModel.setReaderTheme(it) },
+                    onBrightnessChange = { viewModel.setBrightness(it) },
+                    onBrightnessFollowSystemChange = { viewModel.setBrightnessFollowSystem(it) },
+                    onPageModeChange = { viewModel.setPageMode(it) }
+                )
+            }
         }
 
         // Chapter list panel
@@ -335,15 +366,18 @@ fun PagedReader(
             bottom = 80.dp
         )
     ) {
-        Text(
-            text = content,
-            color = textColor,
-            fontSize = fontSize.sp,
-            lineHeight = (fontSize * lineSpacing).sp,
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-        )
+        ) {
+            Text(
+                text = content,
+                color = textColor,
+                fontSize = fontSize.sp,
+                lineHeight = (fontSize * lineSpacing).sp
+            )
+        }
     }
 }
 
@@ -356,10 +390,6 @@ fun VerticalScrollReader(
     modifier: Modifier = Modifier
 ) {
     val listState = rememberLazyListState()
-
-    LaunchedEffect(content) {
-        // Scroll to saved position if available
-    }
 
     LazyColumn(
         state = listState,
@@ -379,7 +409,7 @@ fun VerticalScrollReader(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ReaderSettingsPanel(
+fun ReaderSettingsPanelContent(
     uiState: ReaderUiState,
     textColor: Color,
     backgroundColor: Color,
@@ -388,127 +418,139 @@ fun ReaderSettingsPanel(
     onThemeChange: (ReaderThemeType) -> Unit,
     onBrightnessChange: (Float) -> Unit,
     onBrightnessFollowSystemChange: (Boolean) -> Unit,
-    onPageModeChange: (PageMode) -> Unit,
-    onDismiss: () -> Unit
+    onPageModeChange: (PageMode) -> Unit
 ) {
-    ModalBottomSheet(
-        onDismissRequest = onDismiss,
-        containerColor = backgroundColor
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+            .padding(bottom = 32.dp)
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
+        // Font size
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            // Tabs
-            TabRow(
-                selectedTabIndex = uiState.selectedTab,
-                containerColor = Color.Transparent
+            Text("字体大小", color = textColor)
+            Spacer(modifier = Modifier.width(16.dp))
+            IconButton(
+                onClick = { onFontSizeChange(uiState.fontSize - 2) },
+                enabled = uiState.fontSize > 12
             ) {
-                Tab(
-                    selected = uiState.selectedTab == 0,
-                    onClick = { /* Already handled by state */ },
-                    text = { Text("设置", color = textColor) }
-                )
-                Tab(
-                    selected = uiState.selectedTab == 1,
-                    onClick = { /* Already handled by state */ },
-                    text = { Text("书签", color = textColor) }
-                )
-                Tab(
-                    selected = uiState.selectedTab == 2,
-                    onClick = { /* Already handled by state */ },
-                    text = { Text("笔记", color = textColor) }
-                )
+                Icon(Icons.Default.TextDecrease, contentDescription = "减小", tint = textColor)
             }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Font size
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
+            Text("${uiState.fontSize}sp", color = textColor)
+            IconButton(
+                onClick = { onFontSizeChange(uiState.fontSize + 2) },
+                enabled = uiState.fontSize < 36
             ) {
-                Text("字体大小", color = textColor)
-                Spacer(modifier = Modifier.width(16.dp))
-                IconButton(onClick = { onFontSizeChange(uiState.fontSize - 2) }) {
-                    Icon(Icons.Default.TextDecrease, contentDescription = "减小", tint = textColor)
-                }
-                Text("${uiState.fontSize}sp", color = textColor)
-                IconButton(onClick = { onFontSizeChange(uiState.fontSize + 2) }) {
-                    Icon(Icons.Default.TextIncrease, contentDescription = "增大", tint = textColor)
-                }
+                Icon(Icons.Default.TextIncrease, contentDescription = "增大", tint = textColor)
             }
+        }
 
-            // Brightness
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text("亮度", color = textColor)
-                Spacer(modifier = Modifier.width(16.dp))
-                if (uiState.brightnessFollowSystem) {
-                    Text("跟随系统", color = textColor)
-                } else {
-                    Slider(
-                        value = uiState.brightness,
-                        onValueChange = onBrightnessChange,
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-                Switch(
-                    checked = uiState.brightnessFollowSystem,
-                    onCheckedChange = onBrightnessFollowSystemChange
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Line spacing
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text("行间距", color = textColor)
+            Spacer(modifier = Modifier.width(16.dp))
+            Slider(
+                value = uiState.lineSpacing,
+                onValueChange = onLineSpacingChange,
+                valueRange = 1.0f..3.0f,
+                steps = 7,
+                modifier = Modifier.weight(1f)
+            )
+            Text(String.format("%.1f", uiState.lineSpacing), color = textColor)
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Brightness
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text("亮度", color = textColor)
+            Spacer(modifier = Modifier.width(16.dp))
+            if (uiState.brightnessFollowSystem) {
+                Text("跟随系统", color = textColor.copy(alpha = 0.6f))
+            } else {
+                Slider(
+                    value = uiState.brightness,
+                    onValueChange = onBrightnessChange,
+                    modifier = Modifier.weight(1f)
                 )
             }
+            Switch(
+                checked = uiState.brightnessFollowSystem,
+                onCheckedChange = onBrightnessFollowSystemChange
+            )
+        }
 
-            // Themes
-            Text("主题", color = textColor)
-            Spacer(modifier = Modifier.height(8.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                ReaderThemeType.entries.forEach { theme ->
-                    val themeColor = when (theme) {
-                        ReaderThemeType.WHITE -> Color.White
-                        ReaderThemeType.CREAM -> Color(0xFFF5F0E6)
-                        ReaderThemeType.GREEN -> Color(0xFFE8F5E9)
-                        ReaderThemeType.GRAY -> Color.Gray
-                        ReaderThemeType.BLACK -> Color.Black
-                    }
-                    Box(
-                        modifier = Modifier
-                            .size(40.dp)
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(themeColor)
-                            .border(
-                                width = if (uiState.readerTheme == theme) 2.dp else 0.dp,
-                                color = MaterialTheme.colorScheme.primary,
-                                shape = RoundedCornerShape(8.dp)
-                            )
-                            .clickable { onThemeChange(theme) }
-                    )
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Themes
+        Text("阅读主题", color = textColor)
+        Spacer(modifier = Modifier.height(8.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            ReaderThemeType.entries.forEach { theme ->
+                val themeColor = when (theme) {
+                    ReaderThemeType.WHITE -> Color.White
+                    ReaderThemeType.CREAM -> Color(0xFFF5F0E6)
+                    ReaderThemeType.GREEN -> Color(0xFFE8F5E9)
+                    ReaderThemeType.GRAY -> Color.Gray
+                    ReaderThemeType.BLACK -> Color.Black
                 }
+                Box(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(themeColor)
+                        .border(
+                            width = if (uiState.readerTheme == theme) 2.dp else 0.dp,
+                            color = MaterialTheme.colorScheme.primary,
+                            shape = RoundedCornerShape(8.dp)
+                        )
+                        .clickable { onThemeChange(theme) }
+                )
             }
+        }
 
-            // Page mode
-            Text("翻页模式", color = textColor)
-            Spacer(modifier = Modifier.height(8.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                PageMode.entries.take(4).forEach { mode ->
-                    FilterChip(
-                        selected = uiState.pageMode == mode,
-                        onClick = { onPageModeChange(mode) },
-                        label = { Text(mode.displayName) }
-                    )
-                }
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Page mode
+        Text("翻页模式", color = textColor)
+        Spacer(modifier = Modifier.height(8.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            PageMode.entries.take(4).forEach { mode ->
+                FilterChip(
+                    selected = uiState.pageMode == mode,
+                    onClick = { onPageModeChange(mode) },
+                    label = { Text(mode.displayName) }
+                )
             }
+        }
 
-            Spacer(modifier = Modifier.height(32.dp))
+        // Vertical scroll mode as separate row
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            FilterChip(
+                selected = uiState.pageMode == PageMode.VERTICAL,
+                onClick = { onPageModeChange(PageMode.VERTICAL) },
+                label = { Text(PageMode.VERTICAL.displayName) }
+            )
         }
     }
 }
@@ -545,26 +587,61 @@ fun ChapterListPanel(
             }
             HorizontalDivider()
 
-            LazyColumn {
-                items(chapters) { chapter ->
-                    ListItem(
-                        headlineContent = {
-                            Text(
-                                text = chapter.title,
-                                color = if (chapter.chapterIndex == currentChapterIndex)
-                                    MaterialTheme.colorScheme.primary
-                                else
-                                    MaterialTheme.colorScheme.onSurface
-                            )
-                        },
-                        modifier = Modifier.clickable { onChapterClick(chapter.chapterIndex) },
-                        colors = ListItemDefaults.colors(
-                            containerColor = if (chapter.chapterIndex == currentChapterIndex)
-                                MaterialTheme.colorScheme.primaryContainer
-                            else
-                                Color.Transparent
-                        )
+            if (chapters.isEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "暂无目录",
+                        color = MaterialTheme.colorScheme.outline
                     )
+                }
+            } else {
+                LazyColumn {
+                    items(chapters.size) { index ->
+                        val chapter = chapters.getOrNull(index)
+                        if (chapter != null) {
+                            val isCurrent = index == currentChapterIndex
+                            Surface(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable { onChapterClick(index) },
+                                color = if (isCurrent)
+                                    MaterialTheme.colorScheme.primaryContainer
+                                else
+                                    Color.Transparent
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(vertical = 12.dp, horizontal = 8.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        text = "${index + 1}.",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = if (isCurrent)
+                                            MaterialTheme.colorScheme.primary
+                                        else
+                                            MaterialTheme.colorScheme.outline,
+                                        modifier = Modifier.width(40.dp)
+                                    )
+                                    Text(
+                                        text = chapter.title,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = if (isCurrent)
+                                            MaterialTheme.colorScheme.primary
+                                        else
+                                            MaterialTheme.colorScheme.onSurface,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
+                                }
+                            }
+                            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f))
+                        }
+                    }
                 }
             }
         }

@@ -34,7 +34,7 @@ import com.mochen.reader.domain.model.Note
 fun BookDetailScreen(
     bookId: Long,
     onBackClick: () -> Unit,
-    onReadClick: () -> Unit,
+    onReadClick: (chapterIndex: Int) -> Unit,
     onSearchClick: () -> Unit,
     viewModel: BookDetailViewModel = hiltViewModel()
 ) {
@@ -95,7 +95,15 @@ fun BookDetailScreen(
 
                 // Read button
                 Button(
-                    onClick = onReadClick,
+                    onClick = {
+                        val chapterIndex = uiState.book?.currentProgress?.let { progress ->
+                            if (progress > 0f) {
+                                // Continue from last read position
+                                (progress * uiState.chapters.size).toInt().coerceIn(0, uiState.chapters.size - 1)
+                            } else 0
+                        } ?: 0
+                        onReadClick(chapterIndex)
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp)
@@ -142,7 +150,7 @@ fun BookDetailScreen(
                 when (selectedTab) {
                     0 -> ChaptersTab(
                         chapters = uiState.chapters,
-                        onChapterClick = onReadClick
+                        onChapterClick = { chapterIndex -> onReadClick(chapterIndex) }
                     )
                     1 -> BookmarksTab(
                         bookmarks = uiState.bookmarks,
@@ -284,7 +292,7 @@ fun InfoChip(label: String, value: String) {
 @Composable
 fun ChaptersTab(
     chapters: List<Chapter>,
-    onChapterClick: () -> Unit
+    onChapterClick: (chapterIndex: Int) -> Unit
 ) {
     if (chapters.isEmpty()) {
         Box(
@@ -304,7 +312,7 @@ fun ChaptersTab(
             items(chapters, key = { it.id }) { chapter ->
                 ChapterItem(
                     chapter = chapter,
-                    onClick = onChapterClick
+                    onClick = { onChapterClick(chapter.chapterIndex) }
                 )
             }
         }

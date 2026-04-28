@@ -5,6 +5,8 @@ import android.net.Uri
 import com.mochen.reader.domain.model.Book
 import com.mochen.reader.domain.model.BookFormat
 import com.mochen.reader.domain.model.Chapter
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -12,7 +14,8 @@ import javax.inject.Singleton
 class BookParser @Inject constructor(
     private val txtParser: TxtParser,
     private val epubParser: EpubParser,
-    private val pdfParser: PdfParser
+    private val pdfParser: PdfParser,
+    private val mobiParser: MobipocketParser
 ) {
     fun parseBook(context: Context, uri: Uri): Book? {
         val contentResolver = context.contentResolver
@@ -41,11 +44,15 @@ class BookParser @Inject constructor(
         val extension = fileName.substringAfterLast('.', "").lowercase()
         val format = BookFormat.fromExtension(extension)
 
-        return when (format) {
-            BookFormat.TXT -> txtParser.parseChapters(context, uri, bookId)
-            BookFormat.EPUB -> epubParser.parseChapters(context, uri, bookId)
-            BookFormat.PDF -> pdfParser.parseChapters(context, uri, bookId)
-            else -> emptyList()
+        return withContext(Dispatchers.IO) {
+            when (format) {
+                BookFormat.TXT -> txtParser.parseChapters(context, uri, bookId)
+                BookFormat.EPUB -> epubParser.parseChapters(context, uri, bookId)
+                BookFormat.PDF -> pdfParser.parseChapters(context, uri, bookId)
+                BookFormat.MOBI -> mobiParser.parseChapters(context, uri, bookId)
+                BookFormat.AZW3 -> mobiParser.parseChapters(context, uri, bookId)
+                else -> emptyList()
+            }
         }
     }
 
@@ -54,11 +61,15 @@ class BookParser @Inject constructor(
         val extension = fileName.substringAfterLast('.', "").lowercase()
         val format = BookFormat.fromExtension(extension)
 
-        return when (format) {
-            BookFormat.TXT -> txtParser.readChapterContent(context, uri, chapter)
-            BookFormat.EPUB -> epubParser.readChapterContent(context, uri, chapter)
-            BookFormat.PDF -> pdfParser.readChapterContent(context, uri, chapter)
-            else -> ""
+        return withContext(Dispatchers.IO) {
+            when (format) {
+                BookFormat.TXT -> txtParser.readChapterContent(context, uri, chapter)
+                BookFormat.EPUB -> epubParser.readChapterContent(context, uri, chapter)
+                BookFormat.PDF -> pdfParser.readChapterContent(context, uri, chapter)
+                BookFormat.MOBI -> mobiParser.readChapterContent(context, uri, chapter)
+                BookFormat.AZW3 -> mobiParser.readChapterContent(context, uri, chapter)
+                else -> ""
+            }
         }
     }
 

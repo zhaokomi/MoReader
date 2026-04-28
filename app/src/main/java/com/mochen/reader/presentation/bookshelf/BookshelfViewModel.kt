@@ -12,6 +12,8 @@ import com.mochen.reader.domain.repository.GroupRepository
 import com.mochen.reader.parser.BookParser
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.io.File
@@ -24,6 +26,8 @@ data class BookshelfUiState(
     val selectedGroupId: Long? = null,
     val searchQuery: String = "",
     val isLoading: Boolean = false,
+    val isImporting: Boolean = false,
+    val importProgress: String = "",
     val isGridView: Boolean = true,
     val sortOrder: SortOrder = SortOrder.LAST_READ,
     val isSelectionMode: Boolean = false,
@@ -186,52 +190,114 @@ class BookshelfViewModel @Inject constructor(
 
     fun importBook(uri: Uri) {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
+            _uiState.update { it.copy(isLoading = true, isImporting = true, importProgress = "正在导入...") }
             try {
                 val book = bookParser.parseBook(context, uri)
                 if (book != null) {
                     val existingBook = bookRepository.getBookByPath(book.filePath)
                     if (existingBook == null) {
+                        _uiState.update { it.copy(importProgress = "正在解析章节...") }
                         val bookId = bookRepository.insertBook(book)
                         // Parse chapters
                         val chapters = bookParser.parseChapters(context, uri, bookId)
                         chapterRepository.insertChapters(chapters)
+                        _uiState.update { it.copy(importProgress = "导入完成") }
+                    } else {
+                        _uiState.update { it.copy(importProgress = "书籍已存在") }
                     }
                 }
             } catch (e: Exception) {
-                _uiState.update { it.copy(error = "导入失败: ${e.message}") }
+                _uiState.update { it.copy(error = "导入失败: ${e.message}", importProgress = "导入失败") }
             } finally {
-                _uiState.update { it.copy(isLoading = false) }
+                kotlinx.coroutines.delay(1000) // Show completion message briefly
+                _uiState.update { it.copy(isLoading = false, isImporting = false, importProgress = "") }
             }
         }
     }
 
     fun importBooksFromFolder(folderUri: Uri) {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
+            _uiState.update { it.copy(isLoading = true, isImporting = true) }
             try {
                 val children = context.contentResolver.query(
                     folderUri, null, null, null, null
                 )
+                val supportedExtensions = listOf(".txt", ".epub", ".mobi", ".azw3", ".pdf")
+                val files = mutableListOf<Pair<String, Uri>>()
+
                 children?.use { cursor ->
                     val nameIndex = cursor.getColumnIndex(android.provider.OpenableColumns.DISPLAY_NAME)
                     while (cursor.moveToNext()) {
                         val name = cursor.getString(nameIndex)
-                        if (name.endsWith(".txt", true) ||
-                            name.endsWith(".epub", true) ||
-                            name.endsWith(".mobi", true) ||
-                            name.endsWith(".azw3", true) ||
-                            name.endsWith(".pdf", true)
-                        ) {
+                        if (supportedExtensions.any { name.lowercase().endsWith(it) }) {
                             val childUri = Uri.withAppendedPath(folderUri, name)
-                            importBook(childUri)
+                            files.add(name to childUri)
                         }
                     }
                 }
+
+                if (files.isEmpty()) {
+                    _uiState.update { it.copy(importProgress = "没有找到支持的电子书文件") }
+                    kotlinx.coroutines.delay(1500)
+                    _uiState.update { it.copy(isLoading = false, isImporting = false, importProgress = "") }
+                    return@launch
+                }
+
+                val total = files.size
+                var imported = 0
+                var skipped = 0
+
+                // 并发导入，最多同时处理3本书
+                val batchSize = 3
+                files.chunked(batchSize).forEach { batch ->
+                    val results = batch.map { (name, uri) ->
+                        async {
+                            try {
+                                val book = bookParser.parseBook(context, uri)
+                                if (book != null) {
+                                    val existingBook = bookRepository.getBookByPath(book.filePath)
+                                    if (existingBook == null) {
+                                        val bookId = bookRepository.insertBook(book)
+                                        val chapters = bookParser.parseChapters(context, uri, bookId)
+                                        chapterRepository.insertChapters(chapters)
+                                        true
+                                    } else {
+                                        false // 已存在
+                                    }
+                                } else {
+                                    false
+                                }
+                            } catch (e: Exception) {
+                                false
+                            }
+                        }
+                    }.awaitAll()
+
+                    results.forEachIndexed { index, success ->
+                        val fileName = batch[index].first
+                        if (success) {
+                            imported++
+                        } else {
+                            skipped++
+                        }
+                        val progress = ((imported + skipped) * 100) / total
+                        _uiState.update {
+                            it.copy(importProgress = "导入中 $progress% (${imported + skipped}/$total): $fileName")
+                        }
+                    }
+                }
+
+                val message = if (skipped > 0) {
+                    "导入完成！新增 $imported 本，跳过 $skipped 本（已存在或失败）"
+                } else {
+                    "导入完成！新增 $imported 本"
+                }
+                _uiState.update { it.copy(importProgress = message) }
             } catch (e: Exception) {
-                _uiState.update { it.copy(error = "扫描失败: ${e.message}") }
+                _uiState.update { it.copy(error = "扫描失败: ${e.message}", importProgress = "扫描失败") }
             } finally {
-                _uiState.update { it.copy(isLoading = false) }
+                kotlinx.coroutines.delay(1500)
+                _uiState.update { it.copy(isLoading = false, isImporting = false, importProgress = "") }
             }
         }
     }

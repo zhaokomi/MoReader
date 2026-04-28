@@ -130,18 +130,25 @@ fun MoReaderNavHost() {
                 BookDetailScreen(
                     bookId = bookId,
                     onBackClick = { navController.popBackStack() },
-                    onReadClick = { navController.navigate(Screen.Reader.createRoute(bookId)) },
+                    onReadClick = { chapterIndex ->
+                        navController.navigate(Screen.Reader.createRoute(bookId, chapterIndex))
+                    },
                     onSearchClick = { navController.navigate(Screen.Search.createRoute(bookId)) }
                 )
             }
 
             composable(
                 route = Screen.Reader.route,
-                arguments = listOf(navArgument("bookId") { type = NavType.LongType })
+                arguments = listOf(
+                    navArgument("bookId") { type = NavType.LongType },
+                    navArgument("chapterIndex") { type = NavType.IntType; defaultValue = 0 }
+                )
             ) { backStackEntry ->
                 val bookId = backStackEntry.arguments?.getLong("bookId") ?: return@composable
+                val chapterIndex = backStackEntry.arguments?.getInt("chapterIndex") ?: 0
                 ReaderScreen(
                     bookId = bookId,
+                    initialChapterIndex = chapterIndex,
                     onBackClick = { navController.popBackStack() }
                 )
             }

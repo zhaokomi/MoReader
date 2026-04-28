@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">MoReader</string>
+    <string name="app_name_en">MoReader</string>
+
+    <!-- Navigation -->
+    <string name="nav_bookshelf">Bookshelf</string>
+    <string name="nav_statistics">Statistics</string>
+    <string name="nav_settings">Settings</string>
+
+    <!-- Bookshelf -->
+    <string name="bookshelf_title">My Bookshelf</string>
+    <string name="bookshelf_empty">Your bookshelf is empty. Add some books!</string>
+    <string name="bookshelf_recent_read">Recent Reading</string>
+    <string name="bookshelf_all_books">All Books</string>
+    <string name="bookshelf_add_book">Import Books</string>
+    <string name="bookshelf_grid_view">Grid View</string>
+    <string name="bookshelf_list_view">List View</string>
+    <string name="bookshelf_sort">Sort</string>
+    <string name="bookshelf_search">Search books</string>
+    <string name="bookshelf_batch_manage">Batch Manage</string>
+    <string name="bookshelf_delete">Delete</string>
+    <string name="bookshelf_move">Move</string>
+    <string name="bookshelf_select_all">Select All</string>
+    <string name="bookshelf_deselect_all">Deselect All</string>
+
+    <!-- Sort options -->
+    <string name="sort_by_name">By Name</string>
+    <string name="sort_by_import_time">By Import Time</string>
+    <string name="sort_by_read_time">By Recent Reading</string>
+    <string name="sort_by_progress">By Reading Progress</string>
+
+    <!-- Groups -->
+    <string name="group_default">Default Group</string>
+    <string name="group_create">Create Group</string>
+    <string name="group_edit">Edit Group</string>
+    <string name="group_delete">Delete Group</string>
+    <string name="group_name_hint">Group Name</string>
+
+    <!-- Import -->
+    <string name="import_from_file">Import from File</string>
+    <string name="import_from_folder">Scan Folder</string>
+    <string name="import_from_wifi">WiFi Transfer</string>
+    <string name="import_success">Import successful</string>
+    <string name="import_failed">Import failed</string>
+    <string name="import_duplicate">Book already exists</string>
+
+    <!-- Book Detail -->
+    <string name="book_detail_info">Book Info</string>
+    <string name="book_detail_author">Author</string>
+    <string name="book_detail_format">Format</string>
+    <string name="book_detail_size">File Size</string>
+    <string name="book_detail_progress">Reading Progress</string>
+    <string name="book_detail_chapters">Chapters</string>
+    <string name="book_detail_bookmarks">Bookmarks</string>
+    <string name="book_detail_notes">Notes</string>
+    <string name="book_detail_start_reading">Start Reading</string>
+    <string name="book_detail_continue_reading">Continue Reading</string>
+    <string name="book_detail_change_cover">Change Cover</string>
+
+    <!-- Reader -->
+    <string name="reader_chapter_list">Table of Contents</string>
+    <string name="reader_bookmarks">Bookmarks</string>
+    <string name="reader_notes">Notes</string>
+    <string name="reader_settings">Settings</string>
+    <string name="reader_prev_chapter">Previous Chapter</string>
+    <string name="reader_next_chapter">Next Chapter</string>
+    <string name="reader_page_format">Page %1$d / %2$d</string>
+    <string name="reader_progress_format">%1$d%%</string>
+
+    <!-- Reader Settings -->
+    <string name="reader_font_size">Font Size</string>
+    <string name="reader_font_family">Font Family</string>
+    <string name="reader_line_spacing">Line Spacing</string>
+    <string name="reader_paragraph_spacing">Paragraph Spacing</string>
+    <string name="reader_page_margin">Page Margin</string>
+    <string name="reader_brightness">Brightness</string>
+    <string name="reader_brightness_follow_system">Follow System</string>
+    <string name="reader_theme">Reader Theme</string>
+    <string name="reader_page_mode">Page Turn Mode</string>
+    <string name="reader_screen_orientation">Screen Orientation</string>
+    <string name="reader_keep_screen_on">Keep Screen On</string>
+    <string name="reader_night_mode">Night Mode</string>
+
+    <!-- Page modes -->
+    <string name="page_mode_simulation">Simulation</string>
+    <string name="page_mode_cover">Cover</string>
+    <string name="page_mode_fade">Fade</string>
+    <string name="page_mode_none">None</string>
+    <string name="page_mode_vertical">Vertical Scroll</string>
+
+    <!-- Reader themes -->
+    <string name="theme_white">White</string>
+    <string name="theme_cream">Cream</string>
+    <string name="theme_green">Green</string>
+    <string name="theme_gray">Gray</string>
+    <string name="theme_black">Pure Black</string>
+    <string name="theme_custom">Custom</string>
+
+    <!-- Orientation -->
+    <string name="orientation_auto">Auto</string>
+    <string name="orientation_portrait">Portrait Lock</string>
+    <string name="orientation_landscape">Landscape Lock</string>
+
+    <!-- Bookmark -->
+    <string name="bookmark_add">Add Bookmark</string>
+    <string name="bookmark_delete">Delete Bookmark</string>
+    <string name="bookmark_color_red">Red</string>
+    <string name="bookmark_color_orange">Orange</string>
+    <string name="bookmark_color_yellow">Yellow</string>
+    <string name="bookmark_color_green">Green</string>
+
+    <!-- Highlight -->
+    <string name="highlight_add">Add Highlight</string>
+    <string name="highlight_delete">Delete Highlight</string>
+    <string name="highlight_add_note">Add Note</string>
+
+    <!-- Notes -->
+    <string name="note_add">Add Note</string>
+    <string name="note_edit">Edit Note</string>
+    <string name="note_delete">Delete Note</string>
+    <string name="note_export">Export Notes</string>
+    <string name="note_content_hint">Write your thoughts…</string>
+
+    <!-- Search -->
+    <string name="search_in_book">Search in Book</string>
+    <string name="search_hint">Enter keywords</string>
+    <string name="search_no_result">No results found</string>
+    <string name="search_result_count">Found %1$d results</string>
+
+    <!-- TTS -->
+    <string name="tts_start">Start Reading</string>
+    <string name="tts_pause">Pause Reading</string>
+    <string name="tts_resume">Resume Reading</string>
+    <string name="tts_stop">Stop Reading</string>
+    <string name="tts_speed">Speed</string>
+    <string name="tts_pitch">Pitch</string>
+    <string name="tts_timer">Timer</string>
+    <string name="tts_timer_off">Off</string>
+    <string name="tts_timer_10min">10 minutes</string>
+    <string name="tts_timer_30min">30 minutes</string>
+    <string name="tts_timer_60min">1 hour</string>
+
+    <!-- Statistics -->
+    <string name="statistics_title">Reading Statistics</string>
+    <string name="statistics_today">Today\'s Reading</string>
+    <string name="statistics_total_time">Total Reading Time</string>
+    <string name="statistics_total_books">Books Read</string>
+    <string name="statistics_total_words">Words Read</string>
+    <string name="statistics_reading_goal">Daily Goal</string>
+    <string name="statistics_goal_reached">Goal Reached!</string>
+    <string name="statistics_calendar">Reading Calendar</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_general">General</string>
+    <string name="settings_appearance">Appearance</string>
+    <string name="settings_reading">Reading Settings</string>
+    <string name="settings_backup">Backup &amp; Restore</string>
+    <string name="settings_about">About</string>
+
+    <!-- General settings -->
+    <string name="settings_language">Language</string>
+    <string name="settings_dark_mode">Dark Mode</string>
+    <string name="settings_dark_mode_follow_system">Follow System</string>
+    <string name="settings_dark_mode_off">Light Mode</string>
+    <string name="settings_dark_mode_on">Dark Mode</string>
+    <string name="settings_auto_lock">App Lock</string>
+    <string name="settings_auto_lock_off">Off</string>
+    <string name="settings_auto_lock_pin">PIN</string>
+    <string name="settings_auto_lock_fingerprint">Fingerprint</string>
+
+    <!-- Backup -->
+    <string name="backup_export">Export Backup</string>
+    <string name="backup_import">Import Backup</string>
+    <string name="backup_success">Backup successful</string>
+    <string name="backup_failed">Backup failed</string>
+    <string name="backup_restore_success">Restore successful</string>
+    <string name="backup_restore_failed">Restore failed</string>
+
+    <!-- Cache -->
+    <string name="cache_manage">Cache Management</string>
+    <string name="cache_clear">Clear Cache</string>
+    <string name="cache_size">Cache Size</string>
+
+    <!-- Timer -->
+    <string name="timer_shutdown">Auto Shutdown</string>
+    <string name="timer_shutdown_off">Off</string>
+    <string name="timer_remaining">%1$s remaining</string>
+
+    <!-- About -->
+    <string name="about_version">Version</string>
+    <string name="about_feedback">Feedback</string>
+    <string name="about_privacy">Privacy Policy</string>
+    <string name="about_license">Open Source License</string>
+
+    <!-- Common -->
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="confirm">Confirm</string>
+    <string name="save">Save</string>
+    <string name="delete">Delete</string>
+    <string name="edit">Edit</string>
+    <string name="close">Close</string>
+    <string name="retry">Retry</string>
+    <string name="loading">Loading…</string>
+    <string name="error">Error</string>
+    <string name="success">Success</string>
+
+    <!-- Permissions -->
+    <string name="permission_storage_title">Storage Permission</string>
+    <string name="permission_storage_message">Storage permission is needed to read and manage e-book files</string>
+    <string name="permission_notification_title">Notification Permission</string>
+    <string name="permission_notification_message">Notification permission is needed to show reading controls</string>
+
+    <!-- File formats -->
+    <string name="format_txt">TXT</string>
+    <string name="format_epub">EPUB</string>
+    <string name="format_mobi">MOBI</string>
+    <string name="format_azw3">AZW3</string>
+    <string name="format_pdf">PDF</string>
+
+    <!-- Encoding -->
+    <string name="encoding_auto">Auto Detect</string>
+    <string name="encoding_utf8">UTF-8</string>
+    <string name="encoding_gbk">GBK</string>
+    <string name="encoding_gb2312">GB2312</string>
+    <string name="encoding_big5">BIG5</string>
+
+    <!-- WiFi Transfer -->
+    <string name="wifi_transfer_title">WiFi Transfer</string>
+    <string name="wifi_transfer_hint">Make sure your phone and computer are on the same network</string>
+    <string name="wifi_transfer_address">Access Address</string>
+    <string name="wifi_transfer_open_browser">Open browser to upload</string>
+    <string name="wifi_transfer_stop">Stop Service</string>
+
+    <!-- Error messages -->
+    <string name="error_file_not_found">File not found</string>
+    <string name="error_file_corrupted">File is corrupted</string>
+    <string name="error_unsupported_format">Unsupported file format</string>
+    <string name="error_encoding_detection_failed">Failed to detect file encoding</string>
+    <string name="error_chapter_detection_failed">Failed to detect chapter structure</string>
+
+    <!-- Content descriptions -->
+    <string name="cd_book_cover">Book cover</string>
+    <string name="cd_reading_progress">Reading progress</string>
+    <string name="cd_more_options">More options</string>
+    <string name="cd_back">Back</string>
+    <string name="cd_menu">Menu</string>
+    <string name="cd_search">Search</string>
+    <string name="cd_close">Close</string>
+</resources>
