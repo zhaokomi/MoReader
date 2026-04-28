@@ -70,33 +70,27 @@ fun BookshelfScreen(
             if (showSearch) {
                 // Search bar expanded
                 SearchBar(
-                    inputField = {
-                        SearchBarDefaults.InputField(
-                            query = uiState.searchQuery,
-                            onQueryChange = { viewModel.setSearchQuery(it) },
-                            onSearch = { showSearch = false },
-                            expanded = showSearch,
-                            onExpandedChange = { showSearch = it },
-                            placeholder = { Text(stringResource(R.string.bookshelf_search)) },
-                            leadingIcon = {
-                                IconButton(onClick = {
-                                    viewModel.setSearchQuery("")
-                                    showSearch = false
-                                }) {
-                                    Icon(Icons.Default.ArrowBack, contentDescription = "返回")
-                                }
-                            },
-                            trailingIcon = {
-                                if (uiState.searchQuery.isNotEmpty()) {
-                                    IconButton(onClick = { viewModel.setSearchQuery("") }) {
-                                        Icon(Icons.Default.Clear, contentDescription = "清除")
-                                    }
-                                }
-                            }
-                        )
+                    query = uiState.searchQuery,
+                    onQueryChange = { viewModel.setSearchQuery(it) },
+                    onSearch = { showSearch = false },
+                    active = showSearch,
+                    onActiveChange = { showSearch = it },
+                    placeholder = { Text(stringResource(R.string.bookshelf_search)) },
+                    leadingIcon = {
+                        IconButton(onClick = {
+                            viewModel.setSearchQuery("")
+                            showSearch = false
+                        }) {
+                            Icon(Icons.Default.ArrowBack, contentDescription = "返回")
+                        }
                     },
-                    expanded = showSearch,
-                    onExpandedChange = { showSearch = it },
+                    trailingIcon = {
+                        if (uiState.searchQuery.isNotEmpty()) {
+                            IconButton(onClick = { viewModel.setSearchQuery("") }) {
+                                Icon(Icons.Default.Clear, contentDescription = "清除")
+                            }
+                        }
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = if (showSearch) 0.dp else 16.dp)

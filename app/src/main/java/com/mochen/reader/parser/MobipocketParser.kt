@@ -48,9 +48,6 @@ class MobipocketParser @Inject constructor() {
                 val pdbParser = PdbParser(bytes)
                 if (!pdbParser.isValid) return@use
 
-                // Get MOBI header information
-                val mobiHeader = pdbParser.getMobiHeader()
-
                 // Extract chapter information
                 val tocRecords = pdbParser.getTocRecords()
                 val textRecords = pdbParser.getTextRecords()
