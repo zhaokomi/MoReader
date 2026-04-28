@@ -38,14 +38,14 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build with Gradle
-        run: ./gradlew assembleDebug --stacktrace --info 2>&1 | tail -100
+        run: ./gradlew assembleDebug --stacktrace 2>&1 | tee build.log
 
-      - name: Upload Build Log on failure
-        if: failure()
+      - name: Upload Build Log
         uses: actions/upload-artifact@v4
         with:
           name: build-logs
-          path: app/build/outputs/logs/
+          path: build.log
+          retention-days: 7
 
       - name: Upload APK
         if: success()
