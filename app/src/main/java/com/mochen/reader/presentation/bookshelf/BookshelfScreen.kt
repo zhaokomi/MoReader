@@ -13,7 +13,6 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -24,7 +23,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -32,6 +30,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.DpOffset
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
@@ -50,10 +49,9 @@ fun BookshelfScreen(
     val uiState by viewModel.uiState.collectAsState()
     var showSortMenu by remember { mutableStateOf(false) }
     var showAddMenu by remember { mutableStateOf(false) }
-    var showGroupDialog by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
     var showMoveDialog by remember { mutableStateOf(false) }
-    var showCreateGroupDialog by remember { mutableStateOf(false) }
+    var showSearch by remember { mutableStateOf(false) }
 
     val filePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocument()
@@ -69,61 +67,157 @@ fun BookshelfScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    if (uiState.isSelectionMode) {
-                        Text("${uiState.selectedBookIds.size} 已选择")
-                    } else {
-                        Text(stringResource(R.string.bookshelf_title))
-                    }
-                },
-                navigationIcon = {
-                    if (uiState.isSelectionMode) {
-                        IconButton(onClick = { viewModel.toggleSelectionMode() }) {
-                            Icon(Icons.Default.Close, contentDescription = "关闭")
-                        }
-                    }
-                },
-                actions = {
-                    if (uiState.isSelectionMode) {
-                        IconButton(onClick = { viewModel.selectAll() }) {
-                            Icon(Icons.Default.SelectAll, contentDescription = "全选")
-                        }
-                        IconButton(
-                            onClick = { showMoveDialog = true },
-                            enabled = uiState.selectedBookIds.isNotEmpty()
-                        ) {
-                            Icon(Icons.Default.DriveFileMove, contentDescription = "移动")
-                        }
-                        IconButton(
-                            onClick = { showDeleteDialog = true },
-                            enabled = uiState.selectedBookIds.isNotEmpty()
-                        ) {
-                            Icon(Icons.Default.Delete, contentDescription = "删除")
-                        }
-                    } else {
-                        IconButton(onClick = { viewModel.toggleViewMode() }) {
-                            Icon(
-                                if (uiState.isGridView) Icons.Default.ViewList else Icons.Default.GridView,
-                                contentDescription = "切换视图"
-                            )
-                        }
-                        IconButton(onClick = { showSortMenu = true }) {
-                            Icon(Icons.Default.Sort, contentDescription = "排序")
-                        }
-                        IconButton(onClick = { onGroupManagementClick }) {
-                            Icon(Icons.Default.Folder, contentDescription = "分组管理")
-                        }
-                    }
+            if (showSearch) {
+                // Search bar expanded
+                SearchBar(
+                    inputField = {
+                        SearchBarDefaults.InputField(
+                            query = uiState.searchQuery,
+                            onQueryChange = { viewModel.setSearchQuery(it) },
+                            onSearch = { showSearch = false },
+                            expanded = showSearch,
+                            onExpandedChange = { showSearch = it },
+                            placeholder = { Text(stringResource(R.string.bookshelf_search)) },
+                            leadingIcon = {
+                                IconButton(onClick = {
+                                    viewModel.setSearchQuery("")
+                                    showSearch = false
+                                }) {
+                                    Icon(Icons.Default.ArrowBack, contentDescription = "返回")
+                                }
+                            },
+                            trailingIcon = {
+                                if (uiState.searchQuery.isNotEmpty()) {
+                                    IconButton(onClick = { viewModel.setSearchQuery("") }) {
+                                        Icon(Icons.Default.Clear, contentDescription = "清除")
+                                    }
+                                }
+                            }
+                        )
+                    },
+                    expanded = showSearch,
+                    onExpandedChange = { showSearch = it },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = if (showSearch) 0.dp else 16.dp)
+                ) {
+                    // Search results shown in the main content area
                 }
-            )
+            } else {
+                TopAppBar(
+                    title = {
+                        if (uiState.isSelectionMode) {
+                            Text("${uiState.selectedBookIds.size} 已选择")
+                        } else {
+                            Text(stringResource(R.string.bookshelf_title))
+                        }
+                    },
+                    navigationIcon = {
+                        if (uiState.isSelectionMode) {
+                            IconButton(onClick = { viewModel.toggleSelectionMode() }) {
+                                Icon(Icons.Default.Close, contentDescription = "关闭")
+                            }
+                        }
+                    },
+                    actions = {
+                        if (uiState.isSelectionMode) {
+                            IconButton(onClick = { viewModel.selectAll() }) {
+                                Icon(Icons.Default.SelectAll, contentDescription = "全选")
+                            }
+                            IconButton(
+                                onClick = { showMoveDialog = true },
+                                enabled = uiState.selectedBookIds.isNotEmpty()
+                            ) {
+                                Icon(Icons.Default.DriveFileMove, contentDescription = "移动")
+                            }
+                            IconButton(
+                                onClick = { showDeleteDialog = true },
+                                enabled = uiState.selectedBookIds.isNotEmpty()
+                            ) {
+                                Icon(Icons.Default.Delete, contentDescription = "删除")
+                            }
+                        } else {
+                            // Search icon button (shows search bar on click)
+                            IconButton(onClick = { showSearch = true }) {
+                                Icon(Icons.Default.Search, contentDescription = "搜索")
+                            }
+                            IconButton(onClick = { viewModel.toggleViewMode() }) {
+                                Icon(
+                                    if (uiState.isGridView) Icons.Default.ViewList else Icons.Default.GridView,
+                                    contentDescription = "切换视图"
+                                )
+                            }
+                            Box {
+                                IconButton(onClick = { showSortMenu = true }) {
+                                    Icon(Icons.Default.Sort, contentDescription = "排序")
+                                }
+                                DropdownMenu(
+                                    expanded = showSortMenu,
+                                    onDismissRequest = { showSortMenu = false }
+                                ) {
+                                    SortOrder.entries.forEach { sortOrder ->
+                                        DropdownMenuItem(
+                                            text = { Text(sortOrder.displayName) },
+                                            onClick = {
+                                                viewModel.setSortOrder(sortOrder)
+                                                showSortMenu = false
+                                            },
+                                            leadingIcon = {
+                                                if (uiState.sortOrder == sortOrder) {
+                                                    Icon(Icons.Default.Check, contentDescription = null)
+                                                }
+                                            }
+                                        )
+                                    }
+                                }
+                            }
+                            IconButton(onClick = { onGroupManagementClick }) {
+                                Icon(Icons.Default.Folder, contentDescription = "分组管理")
+                            }
+                        }
+                    }
+                )
+            }
         },
         floatingActionButton = {
             if (!uiState.isSelectionMode) {
-                FloatingActionButton(
-                    onClick = { showAddMenu = true }
-                ) {
-                    Icon(Icons.Default.Add, contentDescription = "添加书籍")
+                Box {
+                    FloatingActionButton(
+                        onClick = { showAddMenu = true }
+                    ) {
+                        Icon(Icons.Default.Add, contentDescription = "添加书籍")
+                    }
+                    DropdownMenu(
+                        expanded = showAddMenu,
+                        onDismissRequest = { showAddMenu = false },
+                        // Position the menu above and to the left of the FAB
+                        offset = DpOffset(x = (-80).dp, y = (-160).dp)
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.import_from_file)) },
+                            onClick = {
+                                filePickerLauncher.launch(arrayOf("*/*"))
+                                showAddMenu = false
+                            },
+                            leadingIcon = { Icon(Icons.Default.FileOpen, contentDescription = null) }
+                        )
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.import_from_folder)) },
+                            onClick = {
+                                folderPickerLauncher.launch(null)
+                                showAddMenu = false
+                            },
+                            leadingIcon = { Icon(Icons.Default.FolderOpen, contentDescription = null) }
+                        )
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.import_from_wifi)) },
+                            onClick = {
+                                onWifiTransferClick()
+                                showAddMenu = false
+                            },
+                            leadingIcon = { Icon(Icons.Default.Wifi, contentDescription = null) }
+                        )
+                    }
                 }
             }
         }
@@ -133,26 +227,6 @@ fun BookshelfScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            // Search bar
-            OutlinedTextField(
-                value = uiState.searchQuery,
-                onValueChange = { viewModel.setSearchQuery(it) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                placeholder = { Text(stringResource(R.string.bookshelf_search)) },
-                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
-                trailingIcon = {
-                    if (uiState.searchQuery.isNotEmpty()) {
-                        IconButton(onClick = { viewModel.setSearchQuery("") }) {
-                            Icon(Icons.Default.Clear, contentDescription = "清除")
-                        }
-                    }
-                },
-                singleLine = true,
-                shape = RoundedCornerShape(12.dp)
-            )
-
             // Group tabs
             if (uiState.groups.isNotEmpty()) {
                 ScrollableTabRow(
@@ -175,34 +249,22 @@ fun BookshelfScreen(
                 }
             }
 
-            // Recent books section
-            if (uiState.recentBooks.isNotEmpty() && uiState.selectedGroupId == null && uiState.searchQuery.isEmpty()) {
-                Text(
-                    text = stringResource(R.string.bookshelf_recent_read),
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-                )
-                LazyRow(
-                    contentPadding = PaddingValues(horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    items(uiState.recentBooks) { book ->
-                        RecentBookItem(
-                            book = book,
-                            onClick = { onBookClick(book.id) }
-                        )
-                    }
-                }
-                Spacer(modifier = Modifier.height(16.dp))
-            }
-
             // Book list
             if (uiState.isLoading) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator()
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        CircularProgressIndicator()
+                        if (uiState.isImporting) {
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Text(
+                                text = uiState.importProgress,
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
+                    }
                 }
             } else if (uiState.books.isEmpty()) {
                 Box(
@@ -222,12 +284,18 @@ fun BookshelfScreen(
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.outline
                         )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            text = "点击右下角 + 按钮导入书籍",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.outline
+                        )
                     }
                 }
             } else {
                 if (uiState.isGridView) {
                     LazyVerticalGrid(
-                        columns = GridCells.Adaptive(minSize = 120.dp),
+                        columns = GridCells.Fixed(3),
                         contentPadding = PaddingValues(16.dp),
                         horizontalArrangement = Arrangement.spacedBy(12.dp),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -281,58 +349,6 @@ fun BookshelfScreen(
                     }
                 }
             }
-        }
-
-        // Sort menu
-        DropdownMenu(
-            expanded = showSortMenu,
-            onDismissRequest = { showSortMenu = false }
-        ) {
-            SortOrder.entries.forEach { sortOrder ->
-                DropdownMenuItem(
-                    text = { Text(sortOrder.displayName) },
-                    onClick = {
-                        viewModel.setSortOrder(sortOrder)
-                        showSortMenu = false
-                    },
-                    leadingIcon = {
-                        if (uiState.sortOrder == sortOrder) {
-                            Icon(Icons.Default.Check, contentDescription = null)
-                        }
-                    }
-                )
-            }
-        }
-
-        // Add menu
-        DropdownMenu(
-            expanded = showAddMenu,
-            onDismissRequest = { showAddMenu = false }
-        ) {
-            DropdownMenuItem(
-                text = { Text(stringResource(R.string.import_from_file)) },
-                onClick = {
-                    filePickerLauncher.launch(arrayOf("*/*"))
-                    showAddMenu = false
-                },
-                leadingIcon = { Icon(Icons.Default.FileOpen, contentDescription = null) }
-            )
-            DropdownMenuItem(
-                text = { Text(stringResource(R.string.import_from_folder)) },
-                onClick = {
-                    folderPickerLauncher.launch(null)
-                    showAddMenu = false
-                },
-                leadingIcon = { Icon(Icons.Default.FolderOpen, contentDescription = null) }
-            )
-            DropdownMenuItem(
-                text = { Text(stringResource(R.string.import_from_wifi)) },
-                onClick = {
-                    onWifiTransferClick()
-                    showAddMenu = false
-                },
-                leadingIcon = { Icon(Icons.Default.Wifi, contentDescription = null) }
-            )
         }
 
         // Delete confirmation dialog
@@ -390,89 +406,14 @@ fun BookshelfScreen(
                             onClick = { showMoveDialog = false },
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            Text("新建分组...")
+                            Text("取消")
                         }
                     }
                 },
                 confirmButton = {},
-                dismissButton = {
-                    TextButton(onClick = { showMoveDialog = false }) {
-                        Text("取消")
-                    }
-                }
+                dismissButton = {}
             )
         }
-    }
-}
-
-@Composable
-fun RecentBookItem(
-    book: Book,
-    onClick: () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .width(100.dp)
-            .clickable(onClick = onClick),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Box(
-            modifier = Modifier
-                .size(80.dp, 110.dp)
-                .clip(RoundedCornerShape(8.dp))
-                .background(MaterialTheme.colorScheme.surfaceVariant)
-        ) {
-            if (book.coverPath != null) {
-                AsyncImage(
-                    model = ImageRequest.Builder(LocalContext.current)
-                        .data(book.coverPath)
-                        .crossfade(true)
-                        .build(),
-                    contentDescription = book.title,
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
-                )
-            } else {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        Icons.Default.Book,
-                        contentDescription = null,
-                        modifier = Modifier.size(40.dp),
-                        tint = MaterialTheme.colorScheme.outline
-                    )
-                }
-            }
-            // Progress badge
-            if (book.currentProgress > 0) {
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                        .padding(4.dp)
-                        .background(
-                            MaterialTheme.colorScheme.primary,
-                            RoundedCornerShape(4.dp)
-                        )
-                        .padding(horizontal = 4.dp, vertical = 2.dp)
-                ) {
-                    Text(
-                        text = "${book.progressPercentage}%",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onPrimary
-                    )
-                }
-            }
-        }
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(
-            text = book.title,
-            style = MaterialTheme.typography.bodySmall,
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis,
-            textAlign = TextAlign.Center
-        )
     }
 }
 

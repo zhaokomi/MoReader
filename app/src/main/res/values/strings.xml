@@ -163,8 +163,8 @@
     <string name="settings_language">语言</string>
     <string name="settings_dark_mode">深色模式</string>
     <string name="settings_dark_mode_follow_system">跟随系统</string>
-    <string name="settings_dark_mode_on">开启</string>
-    <string name="settings_dark_mode_off">关闭</string>
+    <string name="settings_dark_mode_off">白天模式</string>
+    <string name="settings_dark_mode_on">黑夜模式</string>
     <string name="settings_auto_lock">应用锁</string>
     <string name="settings_auto_lock_off">关闭</string>
     <string name="settings_auto_lock_pin">PIN码</string>

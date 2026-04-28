@@ -27,18 +27,34 @@
 18. ✅ GitHub Actions CI/CD 工作流
 19. ✅ 自适应图标资源
 
-## 当前问题 (2026-04-25)
-- ❌ **GitHub Actions 构建失败**: PDF viewer 依赖 (com.github.barteksc:AndroidPdfViewer) 在 JitPack 上的版本存在构建问题
-- 🔧 **临时修复**: 已禁用 PDF viewer 依赖，构建 #16 正在测试中
-- 📝 **待解决问题**: 需要找到可用的 PDF viewer 依赖版本或使用替代方案
+## 修复历史 (2026-04-25)
+1. ✅ 移除不可用的 epublib 依赖，改用自定义 EPUB 解析器
+2. ✅ 临时禁用 PDF viewer 依赖（JitPack 版本问题）
+3. ✅ 修复 hiltViewModel 导入缺失
+4. ✅ 修复 StatisticsViewModel 中 combine 函数的类型推断错误
+5. ✅ 修复 EpubParser 中的 smart cast 问题
+6. ✅ 修复 BookshelfScreen 中的导入和类型问题
+7. ✅ 修复 TxtParser 中的 Jsoup 引用错误
+8. ✅ 修复 BookDetailScreen 中的 smart cast 问题
+
+## 新增功能 (2026-04-29)
+1. ✅ MOBI/AZW3 格式支持：新增 MobipocketParser.kt，支持 MOBI 和 AZW3 电子书格式
+2. ✅ 导入性能优化：使用 async/awaitAll 并发处理批量导入，每批3本书
+3. ✅ 书籍详情页章节导航修复：支持点击目录跳转到指定章节
+4. ✅ 添加英文翻译资源：values-en/strings.xml
+
+## 当前状态
+- ✅ **本地构建成功**: 使用 Java 17 可以成功编译
+- ✅ **GitHub Actions APK 已生成**: 构建 #18 生成了 app-debug APK (16.7 MB)
+- ⚠️ **工作流显示失败**: 可能是 Release 创建步骤出错，但 APK 已上传为 artifact
 
 ## GitHub 配置
-- .github/workflows/build.yml: 自动化构建 (包含构建、artifact 上传、Release 创建)
+- .github/workflows/build.yml: 自动化构建 (使用 JDK 17 Temurin)
 - README.md: 项目文档
 - .gitignore: Android 标准模板
 - LICENSE: Apache 2.0
 
 ## 下一步建议
-1. 等待构建 #16 结果
-2. 解决 PDF viewer 依赖问题后重新启用
-3. 确认 Release 自动创建功能正常
+1. 修复 GitHub Actions 工作流中的 Release 创建步骤
+2. 验证 APK artifact 是否可以正常下载
+3. 可选：重新启用 PDF viewer 依赖（需要找到可用的 JitPack 版本）
